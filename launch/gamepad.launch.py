@@ -1,15 +1,16 @@
 from launch import LaunchDescription
-from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
+
 
 def generate_launch_description():
     ld = LaunchDescription()
 
-    ld.add_action(DeclareLaunchArgument('max_omni_vel', default_value='0.4')) # m/s
-    ld.add_action(DeclareLaunchArgument('max_omni_rot_vel', default_value='1.0')) # rad/s
-    ld.add_action(DeclareLaunchArgument('max_yaw_rot_vel', default_value='2.0')) # rad/s
-    ld.add_action(DeclareLaunchArgument('max_pitch_rot_vel', default_value='2.0')) # rad/s
+    ld.add_action(DeclareLaunchArgument('max_omni_vel', default_value='0.4'))  # m/s
+    ld.add_action(DeclareLaunchArgument('max_omni_rot_vel', default_value='1.0'))  # rad/s
+    ld.add_action(DeclareLaunchArgument('max_yaw_rot_vel', default_value='2.0'))  # rad/s
+    ld.add_action(DeclareLaunchArgument('max_pitch_rot_vel', default_value='2.0'))  # rad/s
 
     joy_node = Node(
         package='joy_linux',
