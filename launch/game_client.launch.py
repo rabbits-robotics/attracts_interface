@@ -7,10 +7,10 @@ from launch_ros.actions import Node
 def generate_launch_description():
     ld = LaunchDescription()
 
-    ld.add_action(DeclareLaunchArgument('max_omni_vel', default_value='0.4'))
-    ld.add_action(DeclareLaunchArgument('max_omni_rot_vel', default_value='1.0'))
-    ld.add_action(DeclareLaunchArgument('max_yaw_rot_vel', default_value='2.0'))
-    ld.add_action(DeclareLaunchArgument('max_pitch_rot_vel', default_value='2.0'))
+    ld.add_action(DeclareLaunchArgument('max_omni_vel', default_value='0.4'))  # m/s
+    ld.add_action(DeclareLaunchArgument('max_omni_rot_vel', default_value='1.0'))  # rad/s
+    ld.add_action(DeclareLaunchArgument('max_yaw_rot_vel', default_value='2.0'))  # rad/s
+    ld.add_action(DeclareLaunchArgument('max_pitch_rot_vel', default_value='2.0'))  # rad/s
 
     game_client_node = Node(
         package='attracts_interface',

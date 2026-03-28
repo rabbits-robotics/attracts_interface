@@ -8,7 +8,7 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <sensor_msgs/msg/joy.hpp>
 
-#include "attracts_msgs/msg/attracts_command.hpp"
+#include <attracts_msgs/msg/attracts_command.hpp>
 
 class Gamepad : public rclcpp::Node
 {
