@@ -129,3 +129,13 @@ void GameClient::UpdatePositions(const attracts_msgs::msg::AttractsCommand & cmd
   joint_state.position.emplace_back(positions_.at(5));
   joint_state_pub_->publish(joint_state);
 }
+
+#ifndef ATTRACTS_INTERFACE_EXCLUDE_MAIN
+int main(int argc, char ** argv)
+{
+  rclcpp::init(argc, argv);
+  rclcpp::spin(std::make_shared<GameClient>());
+  rclcpp::shutdown();
+  return 0;
+}
+#endif
