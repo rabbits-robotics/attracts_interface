@@ -40,18 +40,14 @@ void Gamepad::TimerCB()
 void Gamepad::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
 {
   // --- 足回り
-  // 並進
-  if (joy_msg_.axes.at(7) == 1.0) {
-    cmd.chassis_vel.x = max_omni_vel_;
+  // 並進（ジョイスティック基本、十字キーで上書き）
+  cmd.chassis_vel.x = max_omni_vel_ * joy_msg_.axes.at(1);
+  cmd.chassis_vel.y = max_omni_vel_ * joy_msg_.axes.at(0);
+  if (joy_msg_.axes.at(7) != 0.0) {
+    cmd.chassis_vel.x = max_omni_vel_ * joy_msg_.axes.at(7);
   }
-  if (joy_msg_.axes.at(7) == -1.0) {
-    cmd.chassis_vel.x = -max_omni_vel_;
-  }
-  if (joy_msg_.axes.at(6) == 1.0) {
-    cmd.chassis_vel.y = max_omni_vel_;
-  }
-  if (joy_msg_.axes.at(6) == -1.0) {
-    cmd.chassis_vel.y = -max_omni_vel_;
+  if (joy_msg_.axes.at(6) != 0.0) {
+    cmd.chassis_vel.y = max_omni_vel_ * joy_msg_.axes.at(6);
   }
   // 回転
   if (joy_msg_.buttons.at(6) == 1) {
