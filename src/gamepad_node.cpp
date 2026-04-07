@@ -20,7 +20,7 @@ Gamepad::Gamepad(const rclcpp::NodeOptions & options)
     "joy", 10,
     std::bind(&Gamepad::JoyCB, this, std::placeholders::_1));
   using namespace std::chrono_literals;
-  timer_ = this->create_wall_timer(25ms, std::bind(&Gamepad::TimerCB, this));
+  timer_ = this->create_wall_timer(10ms, std::bind(&Gamepad::TimerCB, this));
 }
 
 void Gamepad::JoyCB(const sensor_msgs::msg::Joy::SharedPtr msg)
@@ -103,7 +103,7 @@ void Gamepad::UpdatePositions(const attracts_msgs::msg::AttractsCommand & cmd)
   positions_.at(4) = cmd.yaw_pos;
   positions_.at(5) = cmd.pitch_pos;
 
-  double joy_freq = 40.0;  // Hz
+  double joy_freq = 100.0;  // Hz
   for (int i = 0; i < 6; i++) {
     positions_.at(i) += joint_vel.at(i) / joy_freq;
   }
