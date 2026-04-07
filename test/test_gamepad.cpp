@@ -87,24 +87,24 @@ TEST_F(GamepadTest, DpadRightSetsChassisRight)
   EXPECT_DOUBLE_EQ(-1.0, cmd.chassis_vel.y);
 }
 
-TEST_F(GamepadTest, Button6SetsRotCcw)
+TEST_F(GamepadTest, Button6SetsChassisModeOn)
 {
   auto joy = MakeJoy();
   joy.buttons[6] = 1;
   node_->JoyCB(std::make_shared<sensor_msgs::msg::Joy>(joy));
   attracts_msgs::msg::AttractsCommand cmd;
   node_->UpdateCmdVel(cmd);
-  EXPECT_DOUBLE_EQ(2.0, cmd.chassis_vel.z);
+  EXPECT_EQ(1, cmd.chassis_mode);
 }
 
-TEST_F(GamepadTest, Button7SetsRotCw)
+TEST_F(GamepadTest, Button7SetsChassisModeOn)
 {
   auto joy = MakeJoy();
   joy.buttons[7] = 1;
   node_->JoyCB(std::make_shared<sensor_msgs::msg::Joy>(joy));
   attracts_msgs::msg::AttractsCommand cmd;
   node_->UpdateCmdVel(cmd);
-  EXPECT_DOUBLE_EQ(-2.0, cmd.chassis_vel.z);
+  EXPECT_EQ(1, cmd.chassis_mode);
 }
 
 TEST_F(GamepadTest, Axis3SetsYaw)
@@ -147,14 +147,14 @@ TEST_F(GamepadTest, PitchClampedHigh)
   EXPECT_NEAR(M_PI / 6, cmd.pitch_pos, 1e-6);
 }
 
-TEST_F(GamepadTest, Button5SetsFire)
+TEST_F(GamepadTest, Button5FireDisabled)
 {
   auto joy = MakeJoy();
   joy.buttons[5] = 1;
   node_->JoyCB(std::make_shared<sensor_msgs::msg::Joy>(joy));
   attracts_msgs::msg::AttractsCommand cmd;
   node_->UpdateCmdVel(cmd);
-  EXPECT_EQ(1, cmd.fire_mode);
+  EXPECT_EQ(0, cmd.fire_mode);  // fire via gamepad is disabled
 }
 
 TEST_F(GamepadTest, Button4SetsLoad)
@@ -177,14 +177,14 @@ TEST_F(GamepadTest, Button0SetsLoad2)
   EXPECT_EQ(2, cmd.load_mode);
 }
 
-TEST_F(GamepadTest, Button1SetsChassisMode)
+TEST_F(GamepadTest, Button1ChassisModeDisabled)
 {
   auto joy = MakeJoy();
   joy.buttons[1] = 1;
   node_->JoyCB(std::make_shared<sensor_msgs::msg::Joy>(joy));
   attracts_msgs::msg::AttractsCommand cmd;
   node_->UpdateCmdVel(cmd);
-  EXPECT_EQ(1, cmd.chassis_mode);
+  EXPECT_EQ(0, cmd.chassis_mode);  // chassis_mode via button1 is disabled
 }
 
 TEST_F(GamepadTest, SpeedModeAlwaysZero)

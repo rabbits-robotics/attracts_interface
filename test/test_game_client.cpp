@@ -106,7 +106,7 @@ TEST_F(GameClientTest, KeyCSetsChassisRotCw)
 TEST_F(GameClientTest, MouseDeltaXSetsYaw)
 {
   auto input = MakeInput();
-  input.mouse_delta_x = 100;  // yaw_pos = 0 + 100/100 = 1.0
+  input.mouse_delta_x = 400;  // yaw_pos = 0 + 400/400 = 1.0
   node_->GameDataInputCB(std::make_shared<attracts_msgs::msg::GameDataInput>(input));
   attracts_msgs::msg::AttractsCommand cmd;
   node_->UpdateCmdVel(cmd);
@@ -156,6 +156,7 @@ TEST_F(GameClientTest, MouseRightButtonSetsFire)
 TEST_F(GameClientTest, MouseLeftButtonSetsLoad)
 {
   auto input = MakeInput();
+  input.mouse_right_button = true;  // load requires right button held
   input.mouse_left_button = true;
   node_->GameDataInputCB(std::make_shared<attracts_msgs::msg::GameDataInput>(input));
   attracts_msgs::msg::AttractsCommand cmd;
