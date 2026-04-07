@@ -61,14 +61,14 @@ void GameClient::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
   // --- 砲塔
   // yaw
   cmd.yaw_pos =
-    positions_.at(4) + static_cast<double>(game_data_input_msg_.mouse_delta_x) / 100.0;
+    positions_.at(4) + static_cast<double>(game_data_input_msg_.mouse_delta_x) / 400.0;
   cmd.yaw_pos = std::fmod(cmd.yaw_pos, 2.0 * M_PI);
   if (cmd.yaw_pos < 0) {
     cmd.yaw_pos += 2.0 * M_PI;
   }
   // pitch
   cmd.pitch_pos =
-    positions_.at(5) + static_cast<double>(game_data_input_msg_.mouse_delta_y) / 100.0;
+    positions_.at(5) + static_cast<double>(game_data_input_msg_.mouse_delta_y) / 400.0;
   if (cmd.pitch_pos < -M_PI / 12) {
     cmd.pitch_pos = -M_PI / 12;
   }
@@ -82,9 +82,12 @@ void GameClient::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
   // --- 動作モード
   if (game_data_input_msg_.mouse_right_button) {
     cmd.fire_mode = 1;
-  }
-  if (game_data_input_msg_.mouse_left_button) {
-    cmd.load_mode = 1;
+    if (game_data_input_msg_.mouse_left_button ||
+        game_data_input_msg_.mouse_side_1_button ||
+        game_data_input_msg_.mouse_side_2_button)
+    {
+      cmd.load_mode = 1;
+    }
   }
   if (game_data_input_msg_.key_r) {
     cmd.load_mode = 2;
