@@ -51,11 +51,9 @@ void Gamepad::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
   }
   // 回転
   if (joy_msg_.buttons.at(6) == 1) {
-    // cmd.chassis_vel.z = max_omni_rot_vel_;
-    cmd.chassis_mode = 1;
+    cmd.chassis_vel.z = max_omni_rot_vel_;
   } else if (joy_msg_.buttons.at(7) == 1) {
-    // cmd.chassis_vel.z = -1.0 * max_omni_rot_vel_;
-    cmd.chassis_mode = 1;
+    cmd.chassis_vel.z = -1.0 * max_omni_rot_vel_;
   }
 
   // --- 砲塔
@@ -78,13 +76,13 @@ void Gamepad::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
   positions_.at(5) = cmd.pitch_pos;
 
   // --- 動作モード
-  // cmd.fire_mode = joy_msg_.buttons.at(5);
+  cmd.fire_mode = joy_msg_.buttons.at(5);
   cmd.load_mode = joy_msg_.buttons.at(4);
   if (joy_msg_.buttons.at(0) == 1) {
     cmd.load_mode = 2;
   }
   cmd.speed_mode = 0;
-  // cmd.chassis_mode = joy_msg_.buttons.at(1);
+  cmd.chassis_mode = joy_msg_.buttons.at(1);
   cmd_pub_->publish(cmd);
 }
 
