@@ -97,6 +97,7 @@ void GameClient::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
     cmd.chassis_mode = 1;
   }
 
+  cmd.header.stamp = get_clock()->now();
   cmd_pub_->publish(cmd);
 }
 

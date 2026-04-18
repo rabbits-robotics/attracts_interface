@@ -83,6 +83,7 @@ void Gamepad::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
   }
   cmd.speed_mode = 0;
   cmd.chassis_mode = joy_msg_.buttons.at(1);
+  cmd.header.stamp = get_clock()->now();
   cmd_pub_->publish(cmd);
 }
 
