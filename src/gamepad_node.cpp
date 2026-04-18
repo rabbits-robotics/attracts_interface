@@ -97,7 +97,7 @@ void Gamepad::UpdatePositions(const attracts_msgs::msg::AttractsCommand & cmd)
   positions_.at(5) = cmd.pitch_pos;
 
   double joy_freq = 100.0;  // Hz
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 4; i++) {
     positions_.at(i) += joint_vel.at(i) / joy_freq;
   }
 
