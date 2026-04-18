@@ -50,11 +50,9 @@ void Gamepad::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
     cmd.chassis_vel.y = max_omni_vel_ * joy_msg_.axes.at(6);
   }
   // 回転
-  if (joy_msg_.buttons.at(6) == 1) {
-    cmd.chassis_vel.z = max_omni_rot_vel_;
-  } else if (joy_msg_.buttons.at(7) == 1) {
-    cmd.chassis_vel.z = -1.0 * max_omni_rot_vel_;
-  }
+  cmd.chassis_vel.z = 0.0;
+  cmd.chassis_vel.z += max_omni_rot_vel_ * 0.5 * (1.0 - joy_msg_.axes.at(5));
+  cmd.chassis_vel.z += -1.0 * max_omni_rot_vel_ * 0.5 * (1.0 - joy_msg_.axes.at(2));
 
   // --- 砲塔
   // yaw
