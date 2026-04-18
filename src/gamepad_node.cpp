@@ -62,7 +62,7 @@ void Gamepad::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
     cmd.yaw_pos += 2.0 * M_PI;
   }
   // pitch
-  cmd.pitch_pos = positions_.at(5) + joy_msg_.axes.at(4) / 10.0;
+  cmd.pitch_pos = positions_.at(5) + joy_msg_.axes.at(4) / 20.0;
   if (cmd.pitch_pos < -M_PI / 12) {
     cmd.pitch_pos = -M_PI / 12;
   }
