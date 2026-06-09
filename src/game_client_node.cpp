@@ -19,8 +19,9 @@ GameClient::GameClient(const rclcpp::NodeOptions & options)
   game_data_input_sub_ = this->create_subscription<attracts_msgs::msg::GameDataInput>(
     "/game_data_input", 10,
     std::bind(&GameClient::GameDataInputCB, this, std::placeholders::_1));
-  using namespace std::chrono_literals;
-  timer_ = this->create_wall_timer(25ms, std::bind(&GameClient::TimerCB, this));
+  timer_ = this->create_wall_timer(
+    std::chrono::duration<double>(1.0 / TIMER_FREQ),
+    std::bind(&GameClient::TimerCB, this));
 }
 
 void GameClient::GameDataInputCB(const attracts_msgs::msg::GameDataInput::SharedPtr msg)
@@ -110,9 +111,8 @@ void GameClient::UpdatePositions(const attracts_msgs::msg::AttractsCommand & cmd
     joint_vel.at(0), joint_vel.at(1), joint_vel.at(2), joint_vel.at(3),
     positions_.at(4));
 
-  double game_client_freq = 20.0;  // Hz
   for (int i = 0; i < 4; i++) {
-    positions_.at(i) += joint_vel.at(i) / game_client_freq;
+    positions_.at(i) += joint_vel.at(i) / TIMER_FREQ;
   }
 
   sensor_msgs::msg::JointState joint_state;

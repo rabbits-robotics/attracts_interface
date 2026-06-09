@@ -21,6 +21,8 @@ public:
   void UpdatePositions(const attracts_msgs::msg::AttractsCommand & cmd);
 
 private:
+  static constexpr double TIMER_FREQ = 100.0;  // Hz
+
   rclcpp::Publisher<attracts_msgs::msg::AttractsCommand>::SharedPtr cmd_pub_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
   rclcpp::Subscription<attracts_msgs::msg::GameDataInput>::SharedPtr game_data_input_sub_;
