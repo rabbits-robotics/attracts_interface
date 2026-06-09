@@ -26,6 +26,23 @@ GameClient::GameClient(const rclcpp::NodeOptions & options)
 void GameClient::GameDataInputCB(const attracts_msgs::msg::GameDataInput::SharedPtr msg)
 {
   game_data_input_msg_ = *msg;
+
+  // 砲塔（マウス）はフレーム受信ごとに1回だけ積分する。
+  // mouse_delta は相対変位イベントなので、timer で毎ティック積分すると多重に積算される。
+  // yaw
+  positions_.at(4) += static_cast<double>(msg->mouse_delta_x) / 400.0;
+  positions_.at(4) = std::fmod(positions_.at(4), 2.0 * M_PI);
+  if (positions_.at(4) < 0) {
+    positions_.at(4) += 2.0 * M_PI;
+  }
+  // pitch
+  positions_.at(5) += static_cast<double>(msg->mouse_delta_y) / 400.0;
+  if (positions_.at(5) < -M_PI / 12) {
+    positions_.at(5) = -M_PI / 12;
+  }
+  if (positions_.at(5) > M_PI / 6) {
+    positions_.at(5) = M_PI / 6;
+  }
 }
 
 void GameClient::TimerCB()
@@ -58,26 +75,9 @@ void GameClient::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
     cmd.chassis_vel.z = -1.0 * max_omni_rot_vel_;
   }
 
-  // --- 砲塔
-  // yaw
-  cmd.yaw_pos =
-    positions_.at(4) + static_cast<double>(game_data_input_msg_.mouse_delta_x) / 400.0;
-  cmd.yaw_pos = std::fmod(cmd.yaw_pos, 2.0 * M_PI);
-  if (cmd.yaw_pos < 0) {
-    cmd.yaw_pos += 2.0 * M_PI;
-  }
-  // pitch
-  cmd.pitch_pos =
-    positions_.at(5) + static_cast<double>(game_data_input_msg_.mouse_delta_y) / 400.0;
-  if (cmd.pitch_pos < -M_PI / 12) {
-    cmd.pitch_pos = -M_PI / 12;
-  }
-  if (cmd.pitch_pos > M_PI / 6) {
-    cmd.pitch_pos = M_PI / 6;
-  }
-  // 前回指令値を保存
-  positions_.at(4) = cmd.yaw_pos;
-  positions_.at(5) = cmd.pitch_pos;
+  // --- 砲塔（積分は GameDataInputCB 側で実施済み。ここでは保持値を読むだけ）
+  cmd.yaw_pos = positions_.at(4);
+  cmd.pitch_pos = positions_.at(5);
 
   // --- 動作モード
   if (game_data_input_msg_.mouse_right_button) {
@@ -109,8 +109,6 @@ void GameClient::UpdatePositions(const attracts_msgs::msg::AttractsCommand & cmd
     cmd.chassis_vel.x, cmd.chassis_vel.y, cmd.chassis_vel.z,
     joint_vel.at(0), joint_vel.at(1), joint_vel.at(2), joint_vel.at(3),
     positions_.at(4));
-  positions_.at(4) = cmd.yaw_pos;
-  positions_.at(5) = cmd.pitch_pos;
 
   double game_client_freq = 20.0;  // Hz
   for (int i = 0; i < 4; i++) {

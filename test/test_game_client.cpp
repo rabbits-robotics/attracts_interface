@@ -207,3 +207,36 @@ TEST_F(GameClientTest, GameDataInputCBSetsMsg)
   node_->UpdateCmdVel(cmd);
   EXPECT_DOUBLE_EQ(1.0, cmd.chassis_vel.x);
 }
+
+// マウスは「受信フレームごとに1回だけ」積分される（timer の多重積分が起きない）
+TEST_F(GameClientTest, TimerDoesNotReintegrateMouse)
+{
+  auto input = MakeInput();
+  input.mouse_delta_x = 400;  // 1フレームで yaw = 1.0
+  node_->GameDataInputCB(std::make_shared<attracts_msgs::msg::GameDataInput>(input));
+
+  attracts_msgs::msg::AttractsCommand cmd1;
+  node_->UpdateCmdVel(cmd1);
+  EXPECT_DOUBLE_EQ(1.0, cmd1.yaw_pos);
+
+  // 同じ入力のまま timer が複数回回っても再積分されない
+  attracts_msgs::msg::AttractsCommand cmd2;
+  node_->UpdateCmdVel(cmd2);
+  attracts_msgs::msg::AttractsCommand cmd3;
+  node_->UpdateCmdVel(cmd3);
+  EXPECT_DOUBLE_EQ(1.0, cmd3.yaw_pos);
+}
+
+// フレームを受信するたびに累積する
+TEST_F(GameClientTest, RepeatedFramesAccumulateYaw)
+{
+  auto input = MakeInput();
+  input.mouse_delta_x = 400;
+  auto msg = std::make_shared<attracts_msgs::msg::GameDataInput>(input);
+  node_->GameDataInputCB(msg);
+  node_->GameDataInputCB(msg);  // 2フレーム受信 → yaw = 2.0
+
+  attracts_msgs::msg::AttractsCommand cmd;
+  node_->UpdateCmdVel(cmd);
+  EXPECT_DOUBLE_EQ(2.0, cmd.yaw_pos);
+}
