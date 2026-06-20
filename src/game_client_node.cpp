@@ -12,6 +12,7 @@ GameClient::GameClient(const rclcpp::NodeOptions & options)
   max_omni_rot_vel_ = this->declare_parameter("max_omni_rot_vel", 0.0);
   max_yaw_rot_vel_ = this->declare_parameter("max_yaw_rot_vel", 0.0);
   max_pitch_rot_vel_ = this->declare_parameter("max_pitch_rot_vel", 0.0);
+  fire_heat_ = this->declare_parameter("fire_heat", 10.0);
 
   cmd_pub_ = this->create_publisher<attracts_msgs::msg::AttractsCommand>("cmd", 10);
   joint_state_pub_ =
@@ -19,6 +20,9 @@ GameClient::GameClient(const rclcpp::NodeOptions & options)
   game_data_input_sub_ = this->create_subscription<attracts_msgs::msg::GameDataInput>(
     "/game_data_input", 10,
     std::bind(&GameClient::GameDataInputCB, this, std::placeholders::_1));
+  game_data_robot_sub_ = this->create_subscription<attracts_msgs::msg::GameDataRobot>(
+    "/game_data_robot", 10,
+    std::bind(&GameClient::GameDataRobotCB, this, std::placeholders::_1));
   timer_ = this->create_wall_timer(
     std::chrono::duration<double>(1.0 / TIMER_FREQ),
     std::bind(&GameClient::TimerCB, this));
@@ -44,6 +48,21 @@ void GameClient::GameDataInputCB(const attracts_msgs::msg::GameDataInput::Shared
   if (positions_.at(5) > M_PI / 6) {
     positions_.at(5) = M_PI / 6;
   }
+}
+
+void GameClient::GameDataRobotCB(const attracts_msgs::msg::GameDataRobot::SharedPtr msg)
+{
+  game_data_robot_msg_ = *msg;
+}
+
+bool GameClient::CanLoad() const
+{
+  // 熱量データ未受信のときはリミットを適用しない。
+  if (game_data_robot_msg_.max_heat == 0) {
+    return true;
+  }
+  // 次の射撃で熱量が最大に達する場合は装填を禁止する（オーバーヒート防止）。
+  return game_data_robot_msg_.current_heat + fire_heat_ < game_data_robot_msg_.max_heat;
 }
 
 void GameClient::TimerCB()
@@ -83,7 +102,7 @@ void GameClient::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
   // --- 動作モード
   if (game_data_input_msg_.mouse_right_button) {
     cmd.fire_mode = 1;
-    if (game_data_input_msg_.mouse_left_button) {
+    if (game_data_input_msg_.mouse_left_button && CanLoad()) {
       cmd.load_mode = 1;
     }
   }

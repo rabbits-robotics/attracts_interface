@@ -164,6 +164,53 @@ TEST_F(GameClientTest, MouseLeftButtonSetsLoad)
   EXPECT_EQ(1, cmd.load_mode);
 }
 
+TEST_F(GameClientTest, LoadAllowedWhenHeatLow)
+{
+  attracts_msgs::msg::GameDataRobot robot;
+  robot.max_heat = 60;
+  robot.current_heat = 0;
+  node_->GameDataRobotCB(std::make_shared<attracts_msgs::msg::GameDataRobot>(robot));
+
+  auto input = MakeInput();
+  input.mouse_right_button = true;
+  input.mouse_left_button = true;
+  node_->GameDataInputCB(std::make_shared<attracts_msgs::msg::GameDataInput>(input));
+  attracts_msgs::msg::AttractsCommand cmd;
+  node_->UpdateCmdVel(cmd);
+  EXPECT_EQ(1, cmd.load_mode);
+}
+
+// 次の射撃で熱量が最大に達する場合は装填を抑制する（fire_heat=10, max=60 → 50で抑制）
+TEST_F(GameClientTest, LoadBlockedWhenHeatNearMax)
+{
+  attracts_msgs::msg::GameDataRobot robot;
+  robot.max_heat = 60;
+  robot.current_heat = 50;
+  node_->GameDataRobotCB(std::make_shared<attracts_msgs::msg::GameDataRobot>(robot));
+
+  auto input = MakeInput();
+  input.mouse_right_button = true;
+  input.mouse_left_button = true;
+  node_->GameDataInputCB(std::make_shared<attracts_msgs::msg::GameDataInput>(input));
+  attracts_msgs::msg::AttractsCommand cmd;
+  node_->UpdateCmdVel(cmd);
+  EXPECT_EQ(0, cmd.load_mode);
+  // 射撃自体は抑制しない
+  EXPECT_EQ(1, cmd.fire_mode);
+}
+
+// 熱量データ未受信(max_heat==0)のときはリミットを適用しない
+TEST_F(GameClientTest, LoadAllowedWhenNoRobotData)
+{
+  auto input = MakeInput();
+  input.mouse_right_button = true;
+  input.mouse_left_button = true;
+  node_->GameDataInputCB(std::make_shared<attracts_msgs::msg::GameDataInput>(input));
+  attracts_msgs::msg::AttractsCommand cmd;
+  node_->UpdateCmdVel(cmd);
+  EXPECT_EQ(1, cmd.load_mode);
+}
+
 TEST_F(GameClientTest, KeyRSetsLoad2)
 {
   auto input = MakeInput();

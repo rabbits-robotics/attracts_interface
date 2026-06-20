@@ -11,6 +11,7 @@ def generate_launch_description():
     ld.add_action(DeclareLaunchArgument('max_omni_rot_vel', default_value='1.0'))  # rad/s
     ld.add_action(DeclareLaunchArgument('max_yaw_rot_vel', default_value='2.0'))  # rad/s
     ld.add_action(DeclareLaunchArgument('max_pitch_rot_vel', default_value='2.0'))  # rad/s
+    ld.add_action(DeclareLaunchArgument('fire_heat', default_value='10.0'))  # 1射の熱量増加量
 
     game_client_node = Node(
         package='attracts_interface',
@@ -23,6 +24,7 @@ def generate_launch_description():
             'max_omni_rot_vel': LaunchConfiguration('max_omni_rot_vel'),
             'max_yaw_rot_vel': LaunchConfiguration('max_yaw_rot_vel'),
             'max_pitch_rot_vel': LaunchConfiguration('max_pitch_rot_vel'),
+            'fire_heat': LaunchConfiguration('fire_heat'),
         }],
     )
 
