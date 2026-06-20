@@ -83,10 +83,7 @@ void GameClient::UpdateCmdVel(attracts_msgs::msg::AttractsCommand & cmd)
   // --- 動作モード
   if (game_data_input_msg_.mouse_right_button) {
     cmd.fire_mode = 1;
-    if (game_data_input_msg_.mouse_left_button ||
-      game_data_input_msg_.mouse_side_1_button ||
-      game_data_input_msg_.mouse_side_2_button)
-    {
+    if (game_data_input_msg_.mouse_left_button) {
       cmd.load_mode = 1;
     }
   }
